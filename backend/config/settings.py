@@ -162,6 +162,15 @@ if not DEBUG:
 WHATSAPP_CLOUD_TOKEN = os.getenv("WHATSAPP_CLOUD_TOKEN", "")
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID", "")
 
+# Errors (500s, assistant failures) go to the container logs.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {"django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False}},
+}
+
 # Voice assistant: Claude for understanding, faster-whisper (local) for speech-to-text.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 ASSISTANT_MODEL = os.getenv("ASSISTANT_MODEL", "claude-opus-5-5")

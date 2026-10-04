@@ -18,3 +18,5 @@ urllib3==2.7.0
 gunicorn==23.0.0
 anthropic==1.11.0
 faster-whisper==1.2.1
+# faster-whisper 1.2 passes metadata_errors= to av.open(), removed in av 17+
+av==16.1.0
