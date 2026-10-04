@@ -1,0 +1,22 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    WHISPER_CACHE_DIR=/app/whisper-models
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN chmod +x docker-entrypoint.sh
+
+EXPOSE 8000
+ENTRYPOINT ["./docker-entrypoint.sh"]
+# gthread: few processes (each holds the Whisper model in RAM) with threads for concurrency;
+# long timeout because a voice note = transcription + an AI round trip.
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--worker-class", "gthread", "--workers", "2", "--threads", "4", "--timeout", "180", "--access-logfile", "-"]

@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+/* =========================================================
+   Mansa Vibes — design tokens
+   Héritage VP (noir, blanc, or mat · Bodoni Moda + Montserrat),
+   épuré pour un usage mobile à une main : grands contrastes,
+   cibles tactiles ≥ 48px, angles doux, beaucoup d'air.
+   ========================================================= */
+
+:root {
+  --bg: #f7f6f3;
+  --bg-card: #ffffff;
+  --bg-sunken: #efede8;
+  --bg-deep: #0b0b0a;
+  --gold: #a6853d;
+  --gold-light: #c9ad74;
+  --gold-dark: #7c6127;
+  --gold-soft: rgba(166, 133, 61, 0.12);
+  --ink: #111110;
+  --ink-soft: #46443f;
+  --muted: #8c897f;
+  --line: rgba(17, 17, 16, 0.1);
+  --line-soft: rgba(17, 17, 16, 0.06);
+  --line-strong: rgba(17, 17, 16, 0.28);
+  /* "white" = the colour that sits on top of ink (flips in dark mode). */
+  --white: #ffffff;
+  --wa: #1fa855;
+
+  --success: #2f7a4f;
+  --success-soft: rgba(47, 122, 79, 0.12);
+  --danger: #b3432f;
+  --danger-soft: rgba(179, 67, 47, 0.1);
+  --warning: #a6853d;
+
+  --font-serif: var(--font-bodoni), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-montserrat), system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0d0b;
+    --bg-card: #181714;
+    --bg-sunken: #121110;
+    --gold: #c9ad74;
+    --gold-light: #dcc69a;
+    --gold-dark: #d6bb84;
+    --gold-soft: rgba(201, 173, 116, 0.14);
+    --ink: #f3f0e9;
+    --ink-soft: #c5c0b4;
+    --muted: #8f8a7e;
+    --line: rgba(243, 240, 233, 0.1);
+    --line-soft: rgba(243, 240, 233, 0.06);
+    --line-strong: rgba(243, 240, 233, 0.28);
+    --white: #111110;
+    --success: #5cb282;
+    --success-soft: rgba(92, 178, 130, 0.14);
+    --danger: #e0785f;
+    --danger-soft: rgba(224, 120, 95, 0.14);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-card: var(--bg-card);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-bg-deep: var(--bg-deep);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-soft: var(--gold-soft);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-line-strong: var(--line-strong);
+  --color-white: var(--white);
+  --color-wa: var(--wa);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold-dark);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Horizontal chip rows scroll without a visible bar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* Safe-area helpers (notch / home indicator) */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-nav {
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+/* Recording pulse for the voice button */
+@keyframes mv-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(179, 67, 47, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 22px rgba(179, 67, 47, 0);
+  }
+}
+.mv-recording {
+  animation: mv-pulse 1.2s ease-out infinite;
+}
+
+@keyframes mv-rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.mv-rise {
+  animation: mv-rise 0.22s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mv-recording,
+  .mv-rise {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------
+   "Tide" surfaces — slow-moving gold mesh on deep black,
+   a cinematic accent used sparingly (hero card, login, public page).
+   Pure CSS gradients: cheap on low-end phones.
+   --------------------------------------------------------- */
+.mv-tide {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #0b0b0a;
+  color: #f7f3ea;
+}
+.mv-tide::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  background:
+    radial-gradient(38% 42% at 22% 30%, rgba(201, 173, 116, 0.55), transparent 70%),
+    radial-gradient(30% 36% at 78% 24%, rgba(166, 133, 61, 0.45), transparent 70%),
+    radial-gradient(42% 40% at 62% 82%, rgba(124, 97, 39, 0.5), transparent 70%),
+    radial-gradient(26% 30% at 18% 86%, rgba(201, 173, 116, 0.28), transparent 70%);
+  filter: blur(28px) saturate(1.1);
+  animation: mv-tide 18s ease-in-out infinite alternate;
+}
+.mv-tide::after {
+  /* fine grain so the gradient reads as a material, not a flat blur */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.18;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.35) 0.5px, transparent 0.6px);
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+}
+@keyframes mv-tide {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, -4%, 0) rotate(8deg) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-5%, 5%, 0) rotate(-6deg) scale(1.02);
+  }
+}
+
+/* Cards ease in as they scroll into view (where supported). */
+@supports (animation-timeline: view()) {
+  .mv-reveal {
+    animation: mv-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+  @keyframes mv-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mv-tide::before,
+  .mv-reveal {
+    animation: none;
+  }
+}

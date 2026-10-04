@@ -1,6 +1,7 @@
 *.log
 .DS_Store
 .env
+*.sql
 .env.backup
 .env.production
 .phpactor.json
@@ -22,3 +23,24 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# --- Django / Next.js rewrite ---
+.env.prod
+.env.local
+backend/.env
+backend/.venv/
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/whisper-models/
+__pycache__/
+*.pyc
+frontend/node_modules/
+frontend/.next/
+frontend/next-env.d.ts
+# One-off import of the real VP production data (customer names, phones):
+# kept off the public repo, copied to the server by hand.
+backend/apps/core/management/commands/import_legacy_dump.py
+
+# Marketing site: separate git repository
+WebsiteVP/

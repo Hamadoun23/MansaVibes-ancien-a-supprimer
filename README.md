@@ -1,59 +1,64 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mansa Vibes — l'atelier de couture, à la voix
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application mobile (PWA) pour les tailleurs et leurs clients : clients et mesures, commandes, encaissements,
+suivi de production — et un **assistant vocal** qui remplit les formulaires à partir d'une note vocale.
 
-## About Laravel
+```
+backend/    Django 6 + DRF + JWT — API REST, assistant (Claude + Whisper local)
+frontend/   Next.js 16 (App Router) + Tailwind v4 — mobile first, installable, hors ligne
+deploy/     nginx interne du déploiement
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Le code Laravel d'origine (racine du dépôt : `app/`, `routes/`, `resources/`…) reste comme référence
+pendant la migration.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Ce que l'application apporte
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Assistant vocal** — « Nouvelle cliente Awa, 76 12 34 56, boubou bazin pour samedi, 45 000, acompte
+  20 000 en Wave ». La note est transcrite sur le serveur (faster-whisper, rien ne part chez un tiers),
+  comprise par Claude, puis affichée en **formulaires pré-remplis** (client, mesures, commande, paiement,
+  statut, message WhatsApp) que l'utilisateur corrige et valide d'un tap. Rien n'est enregistré sans
+  validation ; les droits du rôle (gérant / tailleur) s'appliquent à chaque action.
+- **Aujourd'hui** — un seul écran : en retard, à livrer, prêtes à prévenir, encaissé du jour, reste à encaisser.
+- **Une action, un tap** — « Marquer prête », « Encaisser », « Prévenir sur WhatsApp » depuis les listes.
+- **Espace client sans compte** — chaque client a un lien privé `/suivi/<jeton>` (envoyé par WhatsApp) :
+  avancement de sa tenue, reste à payer, ses mesures, contact de l'atelier. Lien révocable.
+- **Commande express** en 3 étapes (client → tenue → prix et date), dictée possible des détails.
+- **PWA** — installable sur l'écran d'accueil, fonctionne avec une connexion instable (dernières données
+  consultées disponibles hors ligne), mode sombre automatique.
 
-## Learning Laravel
+## Développement local (sans Docker)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```bash
+# backend — SQLite automatiquement quand POSTGRES_DB n'est pas défini
+cd backend
+python -m venv .venv
+./.venv/Scripts/python.exe -m pip install -r requirements.txt
+cp .env.example .env
+./.venv/Scripts/python.exe manage.py migrate
+./.venv/Scripts/python.exe manage.py createsuperuser
+./.venv/Scripts/python.exe manage.py runserver 8000
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# frontend (autre terminal)
+cd frontend
+npm install
+npm run dev            # http://localhost:3000, API sur http://127.0.0.1:8000/api/v1
+```
 
-## Laravel Sponsors
+Pour activer la compréhension des notes vocales, ajouter `ANTHROPIC_API_KEY=...` dans `backend/.env`.
+Sans clé, l'application fonctionne normalement ; seule la compréhension des notes vocales est désactivée.
+Le premier enregistrement télécharge le modèle Whisper (`WHISPER_MODEL`, `small` par défaut, environ 460 Mo).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Tests backend : `./.venv/Scripts/python.exe manage.py test apps`
 
-### Premium Partners
+## Production
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Docker n'est utilisé que sur le serveur :
 
-## Contributing
+```bash
+cp .env.prod.example .env.prod      # puis remplir les secrets
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+La pile (Postgres, Django/gunicorn, Next.js standalone, nginx interne) écoute sur `127.0.0.1:8500` ;
+le nginx de l'hôte termine le HTTPS (Let's Encrypt) et redirige vers ce port.
