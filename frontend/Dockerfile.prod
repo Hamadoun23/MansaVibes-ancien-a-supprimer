@@ -2,7 +2,8 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# npm install (not ci): the lockfile is written on Windows and misses some Linux-only optional deps.
+RUN npm install --no-audit --no-fund
 COPY . .
 # Same-origin API: nginx routes /api to Django, so the bundle needs no host name.
 ARG NEXT_PUBLIC_API_URL=/api/v1
